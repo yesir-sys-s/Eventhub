@@ -110,6 +110,13 @@ def event_delete(request, pk):
 @login_required
 def toggle_attendance(request, pk):
     event = get_object_or_404(Event, pk=pk)
+    now = timezone.now()
+    
+    # Check registration deadline
+    if event.registration_deadline and event.registration_deadline < now:
+        messages.error(request, "Registration for this event has closed.")
+        return redirect('events:event_detail', pk=event.pk)
+        
     if request.user in event.attendees.all():
         event.attendees.remove(request.user)
         messages.success(request, "You're no longer attending this event.")

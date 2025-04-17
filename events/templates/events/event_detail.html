@@ -28,7 +28,7 @@
                         </div>
                     </header>
                     <p class="text-muted">
-                        <i class="bi bi-calendar-event"></i> {{ event.date|date:"F j, Y, g:i a" }}<br>
+                        <i class="bi bi-calendar-event"></i> {{ event.date|date:"F j, Y, g:i A" }}<br>
                         <i class="bi bi-geo-alt"></i> {{ event.location }}
                     </p>
                     <p>{{ event.description|linebreaks }}</p>
@@ -51,7 +51,7 @@
                         {% endif %}
                     </p>
                     {% if event.registration_deadline %}
-                        <p class="mb-3"><strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"F j, Y, g:i a" }}</p>
+                        <p class="mb-3"><strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"F j, Y, g:i A" }}</p>
                     {% endif %}
 
                     {% if user.is_authenticated %}
@@ -69,7 +69,11 @@
                         {% else %}
                             <form method="post" action="{% url 'events:toggle_attendance' event.pk %}" class="d-grid">
                                 {% csrf_token %}
-                                {% if is_attending %}
+                                {% if event.get_event_state == 'finished' %}
+                                    <button type="button" class="btn btn-secondary" disabled>Event Has Ended</button>
+                                {% elif event.get_event_state == 'registration_closed' %}
+                                    <button type="button" class="btn btn-secondary" disabled>Registration Closed</button>
+                                {% elif is_attending %}
                                     <button type="submit" class="btn btn-outline-danger">Cancel Attendance</button>
                                 {% else %}
                                     <button type="submit" class="btn btn-primary" {% if event.capacity > 0 and event.attendees.count >= event.capacity %}disabled{% endif %}>

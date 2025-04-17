@@ -53,6 +53,8 @@ class Event(models.Model):
             return 'cancelled'
         elif self.date < now:
             return 'finished'
+        elif self.registration_deadline and self.registration_deadline < now:
+            return 'registration_closed'
         elif self.capacity > 0 and self.attendees.count() >= self.capacity:
             return 'full'
         return 'open'
