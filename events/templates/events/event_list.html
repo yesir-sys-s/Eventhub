@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<header class="row mb-4">
+    <div class="col-md-8">
+        <h1>Events</h1>
+    </div>
+    <div class="col-md-4">
+        <form class="d-flex" method="get" action="{% url 'events:event_list' %}" role="search">
+            <label class="visually-hidden" for="search">Search events</label>
+            <input class="form-control me-2" type="search" id="search" name="search" placeholder="Search events..." value="{{ search_query|default:'' }}" aria-label="Search events">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+        </form>
+    </div>
+</header>
+
+<div class="row">
+    <section class="col-12 mb-4">
+        <nav class="category-nav">
+            <div class="d-flex justify-content-center flex-wrap gap-3">
+                <a href="{% url 'events:event_list' %}" 
+                   class="text-decoration-none {% if not current_category %}fw-bold{% endif %}">
+                    All 
+                </a>
+                {% for category in categories %}
+                <a href="{% url 'events:event_list' %}?category={{ category.name }}" 
+                   class="text-decoration-none {% if current_category == category.name %}fw-bold{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </nav>
+    </section>
+
+    <section class="col-12" aria-label="Event listings">
+        {% if page_obj %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                {% for event in page_obj %}
+                <article class="col">
+                    <div class="card h-100">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="card-img-top event-image" alt="Image for {{ event.title }}">
+                        {% else %}
+                        <div class="card-img-top bg-secondary event-image" role="img" aria-label="No image available"></div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h3 class="card-title h5">{{ event.title }}</h3>
+                            <p class="card-text text-muted">
+                                <i class="bi bi-calendar-event"></i> {{ event.date|date:"M d, Y H:i" }}<br>
+                                <i class="bi bi-geo-alt"></i> {{ event.location }}
+                            </p>
+                            <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">{{ event.category.name|default:"Uncategorized" }}</span>
+                                {% with state=event.get_event_state %}
+                                <span class="badge {% if state == 'open' %}bg-success{% elif state == 'full' %}bg-warning{% elif state == 'finished' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                    {{ state|title }}
+                                </span>
+                                <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            
+            <nav class="mt-4" aria-label="Event pages">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% else %}
+            <p class="alert alert-info">No events found.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

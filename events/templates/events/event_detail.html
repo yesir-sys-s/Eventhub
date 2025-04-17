@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<article class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <section class="card">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top event-detail-img" alt="Event image for {{ event.title }}">
+                {% else %}
+                    <div class="card-img-top event-detail-img bg-secondary" role="img" aria-label="No image available"></div>
+                {% endif %}
+                <div class="card-body">
+                    <header class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="card-title">{{ event.title }}</h1>
+                        <div>
+                            {% with state=event.get_event_state %}
+                            <span class="badge {% if state == 'open' %}bg-success{% elif state == 'full' %}bg-warning{% elif state == 'finished' %}bg-secondary{% else %}bg-danger{% endif %} me-2">
+                                {{ state|title }}
+                            </span>
+                            {% endwith %}
+                            <span class="badge {% if event.status == 'published' %}bg-success{% elif event.status == 'draft' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ event.get_status_display }}
+                            </span>
+                        </div>
+                    </header>
+                    <p class="text-muted">
+                        <i class="bi bi-calendar-event"></i> {{ event.date|date:"F j, Y, g:i a" }}<br>
+                        <i class="bi bi-geo-alt"></i> {{ event.location }}
+                    </p>
+                    <p>{{ event.description|linebreaks }}</p>
+                </div>
+            </section>
+        </div>
+
+        <aside class="col-md-4">
+            <section class="card mb-4" aria-labelledby="event-details-title">
+                <div class="card-body">
+                    <h2 class="card-title h5" id="event-details-title">Event Details</h2>
+                    <p class="mb-1"><strong>Category:</strong> {{ event.category.name|default:"Uncategorized" }}</p>
+                    <p class="mb-1"><strong>Organizer:</strong> {{ event.organizer.get_full_name|default:event.organizer.username }}</p>
+                    <p class="mb-1">
+                        <strong>Capacity:</strong> 
+                        {% if event.capacity > 0 %}
+                            {{ event.attendees.count }} / {{ event.capacity }}
+                        {% else %}
+                            Unlimited
+                        {% endif %}
+                    </p>
+                    {% if event.registration_deadline %}
+                        <p class="mb-3"><strong>Registration Deadline:</strong> {{ event.registration_deadline|date:"F j, Y, g:i a" }}</p>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        {% if user == event.organizer %}
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'events:event_update' event.pk %}" class="btn btn-outline-primary">Edit Event</a>
+                                <form method="post" action="{% url 'events:event_delete' event.pk %}" class="d-grid">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger" 
+                                            onclick="return confirm('Are you sure you want to delete this event? This action cannot be undone.')">
+                                        Delete Event
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <form method="post" action="{% url 'events:toggle_attendance' event.pk %}" class="d-grid">
+                                {% csrf_token %}
+                                {% if is_attending %}
+                                    <button type="submit" class="btn btn-outline-danger">Cancel Attendance</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary" {% if event.capacity > 0 and event.attendees.count >= event.capacity %}disabled{% endif %}>
+                                        Attend Event
+                                    </button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            Please <a href="{% url 'login' %}">log in</a> to attend this event.
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            {% if event.attendees.exists %}
+            <section class="card" aria-labelledby="attendees-title">
+                <div class="card-body">
+                    <h2 class="card-title h5" id="attendees-title">Attendees ({{ event.attendees.count }})</h2>
+                    <div class="d-flex flex-wrap gap-2" role="list">
+                        {% for attendee in event.attendees.all %}
+                            <div role="listitem" class="text-center">
+                                {% if attendee.profile_picture %}
+                                    <img src="{{ attendee.profile_picture.url }}" alt="Profile picture of {{ attendee.username }}" class="attendee-avatar">
+                                {% else %}
+                                    <div class="attendee-avatar bg-secondary" role="img" aria-label="No profile picture"></div>
+                                {% endif %}
+                                <div class="small">{{ attendee.get_full_name|default:attendee.username }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </aside>
+    </div>
+</article>
+{% endblock %}

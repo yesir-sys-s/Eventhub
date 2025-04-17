@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0 fluid-text-xl">{{ title }}</h4>
+            </div>
+            <div class="card-body fluid-text">
+                <!-- Form tips -->
+                <div class="alert alert-info mb-4">
+                    <h5 class="alert-heading fluid-text-lg"><i class="bi bi-info-circle"></i> Quick Tips</h5>
+                    <ul class="mb-0">
+                        <li>All fields marked with * are required</li>
+                        <li>Image uploads should be at least 800x600px</li>
+                        <li>Registration deadline must be before event date</li>
+                    </ul>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Basic Info Section -->
+                    <div class="mb-4 p-3 border rounded bg-light">
+                        <h5 class="mb-3 fluid-text">Basic Information</h5>
+                        {% for field in form %}
+                            {% if field.name in 'title,description,category' %}
+                                {{ field|as_crispy_field }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Date and Location Section -->
+                    <div class="mb-4 p-3 border rounded bg-light">
+                        <h5 class="mb-3 fluid-text">Date & Location</h5>
+                        {% for field in form %}
+                            {% if field.name in 'date,location,registration_deadline' %}
+                                {{ field|as_crispy_field }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Additional Details Section -->
+                    <div class="mb-4 p-3 border rounded bg-light">
+                        <h5 class="mb-3 fluid-text">Additional Details</h5>
+                        {% for field in form %}
+                            {% if field.name in 'image,status,capacity' %}
+                                {{ field|as_crispy_field }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2 justify-content-end">
+                        <a href="{% url 'events:event_list' %}" class="btn btn-outline-secondary fluid-text-sm">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary fluid-text-sm">
+                            <i class="bi bi-check-circle"></i> Save Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

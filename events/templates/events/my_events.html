@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Events{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>My Events</h1>
+        
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#organized">Organized Events</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#attending">Attending Events</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="organized">
+                {% if organized_events %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for event in organized_events %}
+                        <div class="col">
+                            <div class="card h-100">
+                                {% if event.image %}
+                                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                <div class="card-img-top bg-secondary" style="height: 200px;"></div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">{{ event.title }}</h5>
+                                        <span class="badge {% if event.status == 'published' %}bg-success{% elif event.status == 'draft' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ event.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <p class="card-text text-muted">
+                                        <i class="bi bi-calendar-event"></i> {{ event.date|date:"M d, Y H:i" }}<br>
+                                        <i class="bi bi-geo-alt"></i> {{ event.location }}
+                                    </p>
+                                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">{{ event.category.name|default:"Uncategorized" }}</span>
+                                        <div class="btn-group">
+                                            <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="{% url 'events:event_update' event.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                            <a href="{% url 'events:event_delete' event.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">
+                                        Attendees: {{ event.attendees.count }}
+                                        {% if event.capacity > 0 %}
+                                        / {{ event.capacity }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        You haven't organized any events yet. 
+                        <a href="{% url 'events:event_create' %}" class="alert-link">Create your first event</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="tab-pane fade" id="attending">
+                {% if attended_events %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for event in attended_events %}
+                        <div class="col">
+                            <div class="card h-100">
+                                {% if event.image %}
+                                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                <div class="card-img-top bg-secondary" style="height: 200px;"></div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.title }}</h5>
+                                    <p class="card-text text-muted">
+                                        <i class="bi bi-calendar-event"></i> {{ event.date|date:"M d, Y H:i" }}<br>
+                                        <i class="bi bi-geo-alt"></i> {{ event.location }}
+                                    </p>
+                                    <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-primary">{{ event.category.name|default:"Uncategorized" }}</span>
+                                        <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">Organized by {{ event.organizer.get_full_name|default:event.organizer.username }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        You're not attending any events yet.
+                        <a href="{% url 'events:event_list' %}" class="alert-link">Browse events</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

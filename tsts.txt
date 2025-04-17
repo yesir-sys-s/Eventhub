@@ -1,0 +1,22 @@
+# First verify git is installed
+git --version
+
+# If the above works, proceed with these commands
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+# Remove old origin if exists
+git remote remove origin
+# Add new origin with your username
+git remote add origin https://github.com/HannaMagno/Eventhub.git
+# Force push to overwrite remote repository
+git push -f -u origin main
+
+# If any command fails, ensure:
+# 1. Git is installed
+# 2. You're in the correct directory
+# 3. You have proper permissions
+# 4. The repository exists on GitHub
+# 5. You have created the repository on GitHub before pushing
+# 6. You are using the correct GitHub username (HannaMagno)

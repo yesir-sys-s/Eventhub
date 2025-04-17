@@ -1,0 +1,23 @@
+/* Navigation */
+.navbar {
+    background: var(--gradient-primary);
+}
+
+/* Profile images */
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.nav-profile-picture {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+}
+
+/* Event images */
+.event-image {
+    height: 200px;
+    object-fit: cover;
+}

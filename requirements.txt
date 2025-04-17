@@ -1,0 +1,7 @@
+Django>=4.2,<5.0
+Pillow>=10.0.0  # For image handling
+python-dotenv>=1.0.0  # For environment variables
+django-crispy-forms>=2.0  # For better form rendering
+crispy-bootstrap5>=0.7  # Bootstrap 5 template pack for crispy-forms
+whitenoise>=6.0.0  # For static files serving
+
