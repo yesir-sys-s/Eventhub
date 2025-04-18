@@ -1,0 +1,61 @@
+# EventHub Setup Instructions - Simple Guide 🚀
+
+Before you start:
+✅ Make sure Python is installed on your computer 
+   Download from: https://www.python.org/downloads/
+   (During installation, check "Add Python to PATH")
+
+Step-by-Step Guide:
+
+1. Download the Project
+   - Click the green "Code" button on GitHub
+   - Select "Download ZIP"
+   - Extract the ZIP file to your desired location
+   - Open your computer's terminal/command prompt
+   - Type: cd "path/to/extracted/folder"
+   (Replace "path/to/extracted/folder" with actual location)
+
+2. Set Up Your Project Space
+   Copy and paste these commands one by one:
+
+   # For Mac/Linux users:
+   python3 -m venv venv
+   source venv/bin/activate
+
+   # For Windows users:
+   python -m venv venv
+   venv\Scripts\activate
+
+   # After activation, for all users:
+   pip install -r requirements.txt
+
+3. Prepare the Project
+   Copy and paste each line, press Enter after each:
+   python manage.py migrate
+   python manage.py collectstatic
+   
+4. Create Admin Account
+   Type: python manage.py createsuperuser
+   Follow the prompts to create your username and password
+   (Remember these details - you'll need them to log in!)
+
+5. Start the Website
+   Type: python manage.py runserver
+   
+   The website will be available at:
+   http://127.0.0.1:8000 (click or copy/paste this into your browser)
+
+🎉 Congratulations! You're all set!
+
+Need Help?
+- If you see any errors in red text, make sure Python is installed correctly
+- Check that you're in the right folder
+- Make sure you typed the commands exactly as shown
+- Still stuck? Ask for help in our project's Issues section on GitHub
+
+Available Features:
+🔐 User registration and login
+📅 Create and manage events
+👤 Customize your profile
+🎨 Switch between light/dark themes
+📱 Works on mobile devices
